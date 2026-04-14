@@ -2,6 +2,8 @@
 
 Each process is a **peer**: it stores files under a local directory, **replicates** uploads to configured peers over HTTP, and **searches** peers sequentially when a download misses locally. There is no central coordinator—only peer URLs in configuration (plus optional runtime registration).
 
+System-wide design (frontend + flows): see [`../docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md).
+
 ## Requirements
 
 - Java 17+
