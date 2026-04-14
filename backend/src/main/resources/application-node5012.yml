@@ -1,0 +1,10 @@
+# Profile: node5012 — run: mvn spring-boot:run -Dspring-boot.run.profiles=node5012
+server:
+  port: 5012
+
+node:
+  id: node-5012
+  storage: storage_node_5012
+  peers:
+    - http://localhost:5010
+    - http://localhost:5011

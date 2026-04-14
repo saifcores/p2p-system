@@ -1,0 +1,40 @@
+# Default node (port 5010). Override with SPRING_PROFILES_ACTIVE=node5011 etc. or --server.port
+server:
+  port: 5010
+  # Raw octet-stream uploads use Tomcat maxPostSize (default 2MB is too small for multi-MB files)
+  tomcat:
+    max-http-form-post-size: 100MB
+
+spring:
+  application:
+    name: p2p-node
+
+node:
+  id: node-5010
+  storage: storage_node_5010
+  peers:
+    - http://localhost:5011
+    - http://localhost:5012
+  peer-timeout-ms: 5000
+  replication-retry-count: 2
+  replication-retry-delay-ms: 300
+  parallel-replication: true
+  async-replication: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus,info
+  endpoint:
+    health:
+      show-details: when_authorized
+
+p2p:
+  cors:
+    # Comma-separated Ant-style patterns (Spring 5.3+). Match Vite default port and LAN previews.
+    allowed-origin-patterns: http://localhost:*,http://127.0.0.1:*
+
+logging:
+  level:
+    com.p2p.node: INFO
