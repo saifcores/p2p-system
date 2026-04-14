@@ -1,0 +1,221 @@
+import type {
+  ActivityItem,
+  GraphEdge,
+  LogLine,
+  MeshFile,
+  MeshNode,
+  ReplicationEntry,
+} from "../types";
+
+export const initialNodes: MeshNode[] = [
+  {
+    id: "n1",
+    label: "edge-tokyo-1",
+    port: 7401,
+    status: "online",
+    latencyMs: 12,
+    storageUsedPct: 42,
+    peers: ["n2", "n3", "n4"],
+    region: "ap-northeast-1",
+    enabled: true,
+    baseUrl: "http://localhost:7401",
+  },
+  {
+    id: "n2",
+    label: "edge-oregon-2",
+    port: 7402,
+    status: "online",
+    latencyMs: 28,
+    storageUsedPct: 61,
+    peers: ["n1", "n3", "n5"],
+    region: "us-west-2",
+    enabled: true,
+    baseUrl: "http://localhost:7402",
+  },
+  {
+    id: "n3",
+    label: "core-eu-1",
+    port: 7403,
+    status: "degraded",
+    latencyMs: 94,
+    storageUsedPct: 78,
+    peers: ["n1", "n2", "n6"],
+    region: "eu-central-1",
+    enabled: true,
+    baseUrl: "http://localhost:7403",
+  },
+  {
+    id: "n4",
+    label: "edge-sin-1",
+    port: 7404,
+    status: "online",
+    latencyMs: 19,
+    storageUsedPct: 33,
+    peers: ["n1", "n5"],
+    region: "ap-southeast-1",
+    enabled: true,
+    baseUrl: "http://localhost:7404",
+  },
+  {
+    id: "n5",
+    label: "edge-syd-1",
+    port: 7405,
+    status: "offline",
+    latencyMs: 0,
+    storageUsedPct: 0,
+    peers: ["n2", "n4"],
+    region: "ap-southeast-2",
+    enabled: false,
+    baseUrl: "http://localhost:7405",
+  },
+  {
+    id: "n6",
+    label: "core-eu-2",
+    port: 7406,
+    status: "online",
+    latencyMs: 41,
+    storageUsedPct: 55,
+    peers: ["n3"],
+    region: "eu-west-1",
+    enabled: true,
+    baseUrl: "http://localhost:7406",
+  },
+];
+
+export const initialEdges: GraphEdge[] = [
+  { from: "n1", to: "n2" },
+  { from: "n1", to: "n3" },
+  { from: "n1", to: "n4" },
+  { from: "n2", to: "n3" },
+  { from: "n2", to: "n5" },
+  { from: "n3", to: "n6" },
+  { from: "n4", to: "n5" },
+];
+
+export const initialFiles: MeshFile[] = [
+  {
+    id: "f1",
+    name: "dataset-manifest.json",
+    sizeBytes: 128_400,
+    replicaNodes: ["n1", "n2", "n3", "n4"],
+    requiredReplicas: 3,
+    status: "replicated",
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "f2",
+    name: "model-checkpoint-v3.bin",
+    sizeBytes: 1_204_882_944,
+    replicaNodes: ["n1", "n2", "n6"],
+    requiredReplicas: 3,
+    status: "degraded",
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "f3",
+    name: "shard-0a.parquet",
+    sizeBytes: 402_653_184,
+    replicaNodes: ["n3"],
+    requiredReplicas: 3,
+    status: "critical",
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "f4",
+    name: "routing-table.pb",
+    sizeBytes: 2_048_000,
+    replicaNodes: ["n1", "n2", "n3", "n4", "n6"],
+    requiredReplicas: 2,
+    status: "replicated",
+    updatedAt: new Date().toISOString(),
+  },
+];
+
+const now = () => new Date().toISOString();
+
+export const initialActivity: ActivityItem[] = [
+  {
+    id: "a1",
+    at: now(),
+    type: "replication",
+    message: "Replicated shard-0a.parquet → core-eu-1 (partial)",
+  },
+  {
+    id: "a2",
+    at: now(),
+    type: "transfer",
+    message: "Ingress 42 MB from edge-tokyo-1",
+  },
+  {
+    id: "a3",
+    at: now(),
+    type: "health",
+    message: "Quorum maintained across 5/6 active peers",
+  },
+  {
+    id: "a4",
+    at: now(),
+    type: "error",
+    message: "edge-syd-1 heartbeat missed (3x) — marked offline",
+  },
+];
+
+export const initialReplication: ReplicationEntry[] = [
+  {
+    id: "r1",
+    at: now(),
+    sourceId: "n1",
+    targetId: "n3",
+    fileName: "dataset-manifest.json",
+    status: "success",
+    bytes: 128_400,
+  },
+  {
+    id: "r2",
+    at: now(),
+    sourceId: "n2",
+    targetId: "n6",
+    fileName: "model-checkpoint-v3.bin",
+    status: "pending",
+    bytes: 512_000_000,
+  },
+  {
+    id: "r3",
+    at: now(),
+    sourceId: "n4",
+    targetId: "n5",
+    fileName: "shard-0a.parquet",
+    status: "failed",
+  },
+];
+
+export const initialLogs: LogLine[] = [
+  {
+    id: "l1",
+    at: now(),
+    level: "info",
+    channel: "replication",
+    message: "chunk commit ack from core-eu-1 seq=8821",
+  },
+  {
+    id: "l2",
+    at: now(),
+    level: "warn",
+    channel: "system",
+    message: "backpressure: edge-oregon-2 queue depth 0.82",
+  },
+  {
+    id: "l3",
+    at: now(),
+    level: "info",
+    channel: "request",
+    message: "GET /v1/files/f4 signed URL issued (ttl=300s)",
+  },
+  {
+    id: "l4",
+    at: now(),
+    level: "error",
+    channel: "replication",
+    message: "target edge-syd-1 unreachable during push",
+  },
+];
