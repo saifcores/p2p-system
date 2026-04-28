@@ -1,14 +1,15 @@
 import { RefreshCw } from "lucide-react";
 import { useMeshData } from "../context/useMeshData";
+import { formatTimeUi } from "../locale";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { Card, CardHeader } from "../components/ui/Card";
 import type { ReplicationEntry } from "../types";
 
 function repBadge(s: ReplicationEntry["status"]) {
-  if (s === "success") return <Badge variant="success">Completed</Badge>;
-  if (s === "pending") return <Badge variant="info">In flight</Badge>;
-  return <Badge variant="danger">Failed</Badge>;
+  if (s === "success") return <Badge variant="success">Terminé</Badge>;
+  if (s === "pending") return <Badge variant="info">En cours</Badge>;
+  return <Badge variant="danger">Échec</Badge>;
 }
 
 export function ReplicationPage() {
@@ -20,8 +21,8 @@ export function ReplicationPage() {
     <div className="space-y-6">
       <Card className="overflow-hidden">
         <CardHeader
-          title="Replication map"
-          subtitle="Directed transfers · RDMA-capable links (simulated)"
+          title="Carte de réplication"
+          subtitle="Transferts dirigés · liaisons type RDMA (simulé)"
         />
         <div className="relative h-[280px] overflow-hidden rounded-2xl border border-white/[0.06] bg-[#020617]">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(34,211,238,0.12),transparent_55%)]" />
@@ -90,24 +91,26 @@ export function ReplicationPage() {
             })}
           </svg>
           <div className="pointer-events-none absolute bottom-4 left-4 rounded-xl border border-white/[0.08] bg-black/30 px-3 py-2 text-[11px] text-slate-400 backdrop-blur-md">
-            Live fan-out · backoff on tail peers
+            Diffusion temps réel · backoff sur pairs de queue
           </div>
         </div>
       </Card>
 
       <Card>
         <CardHeader
-          title="Replication log"
-          subtitle="Source → target with retry"
+          title="Journal de réplication"
+          subtitle="Source → cible avec nouvelle tentative"
         />
         <div className="overflow-x-auto">
           <table className="w-full min-w-[860px] border-separate border-spacing-0">
             <thead>
               <tr className="text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                <th className="border-b border-white/[0.06] pb-3 pl-1">Time</th>
+                <th className="border-b border-white/[0.06] pb-3 pl-1">
+                  Heure
+                </th>
                 <th className="border-b border-white/[0.06] pb-3">Route</th>
-                <th className="border-b border-white/[0.06] pb-3">Object</th>
-                <th className="border-b border-white/[0.06] pb-3">Status</th>
+                <th className="border-b border-white/[0.06] pb-3">Objet</th>
+                <th className="border-b border-white/[0.06] pb-3">État</th>
                 <th className="border-b border-white/[0.06] pb-3 pr-1 text-right">
                   Action
                 </th>
@@ -120,14 +123,14 @@ export function ReplicationPage() {
                     colSpan={5}
                     className="py-10 text-center text-sm text-slate-500"
                   >
-                    Loading replication ledger…
+                    Chargement du journal de réplication…
                   </td>
                 </tr>
               ) : (
                 replication.map((r) => (
                   <tr key={r.id}>
                     <td className="border-b border-white/[0.04] py-4 pl-1 font-mono text-xs text-slate-400">
-                      {new Date(r.at).toLocaleTimeString()}
+                      {formatTimeUi(r.at)}
                     </td>
                     <td className="border-b border-white/[0.04] py-4">
                       <span className="text-sm text-slate-200">
@@ -152,7 +155,7 @@ export function ReplicationPage() {
                           onClick={() => retryReplication(r.id)}
                         >
                           <RefreshCw className="h-4 w-4" />
-                          Retry
+                          Réessayer
                         </Button>
                       ) : (
                         <span className="text-xs text-slate-600">—</span>

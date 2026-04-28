@@ -9,11 +9,11 @@ import type { MeshNode } from "../types";
 
 function nodeBadge(n: MeshNode) {
   if (!n.enabled || n.status === "offline")
-    return <Badge variant="muted">Offline</Badge>;
-  if (n.status === "degraded") return <Badge variant="warning">Degraded</Badge>;
+    return <Badge variant="muted">Hors ligne</Badge>;
+  if (n.status === "degraded") return <Badge variant="warning">Dégradé</Badge>;
   return (
     <Badge variant="success" dot>
-      Online
+      En ligne
     </Badge>
   );
 }
@@ -32,8 +32,8 @@ export function NodesPage() {
     <div className="space-y-6">
       <Card>
         <CardHeader
-          title="Fleet"
-          subtitle="Operator controls · simulate failures safely"
+          title="Parc"
+          subtitle="Pilotage opérateur · simulation de pannes en sécurité"
           action={
             <div className="flex flex-wrap gap-2">
               <Button
@@ -41,7 +41,7 @@ export function NodesPage() {
                 leftIcon={<UserPlus className="h-4 w-4" />}
                 onClick={addPeer}
               >
-                Add peer
+                Ajouter un pair
               </Button>
             </div>
           }
@@ -50,10 +50,10 @@ export function NodesPage() {
           <table className="w-full min-w-[760px] border-separate border-spacing-0">
             <thead>
               <tr className="text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                <th className="border-b border-white/[0.06] pb-3 pl-1">Node</th>
+                <th className="border-b border-white/[0.06] pb-3 pl-1">Nœud</th>
                 <th className="border-b border-white/[0.06] pb-3">Port</th>
-                <th className="border-b border-white/[0.06] pb-3">Status</th>
-                <th className="border-b border-white/[0.06] pb-3">Storage</th>
+                <th className="border-b border-white/[0.06] pb-3">État</th>
+                <th className="border-b border-white/[0.06] pb-3">Stockage</th>
                 <th className="border-b border-white/[0.06] pb-3 pr-1 text-right">
                   Actions
                 </th>
@@ -66,7 +66,7 @@ export function NodesPage() {
                     colSpan={5}
                     className="py-10 text-center text-sm text-slate-500"
                   >
-                    Resolving peer registry…
+                    Résolution du registre des pairs…
                   </td>
                 </tr>
               ) : (
@@ -108,17 +108,17 @@ export function NodesPage() {
                           variant={n.enabled ? "secondary" : "primary"}
                           onClick={() => toggleNode(n.id)}
                           aria-label={
-                            n.enabled ? "Turn off node" : "Turn on node"
+                            n.enabled ? "Éteindre le nœud" : "Allumer le nœud"
                           }
                         >
                           <Power className="h-4 w-4" />
-                          {n.enabled ? "Off" : "On"}
+                          {n.enabled ? "Arrêt" : "Marche"}
                         </Button>
                         <Button
                           size="sm"
                           variant="danger"
                           onClick={() => removePeer(n.id)}
-                          aria-label="Remove peer"
+                          aria-label="Retirer le pair"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -135,30 +135,32 @@ export function NodesPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader
-            title="Health signals"
-            subtitle="Synthetic probes · 500ms interval"
+            title="Signaux de santé"
+            subtitle="Sondes synthétiques · intervalle 500 ms"
           />
           <div className="grid gap-4 sm:grid-cols-3">
-            {["P95 latency", "Packet loss", "Disk pressure"].map((label, i) => (
-              <div
-                key={label}
-                className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4"
-              >
-                <p className="text-xs text-slate-500">{label}</p>
-                <p className="mt-2 text-2xl font-semibold text-white">
-                  {i === 0
-                    ? `${18 + (nodes.length % 7)} ms`
-                    : i === 1
-                      ? `${(0.02).toFixed(2)}%`
-                      : "Low"}
-                </p>
-                <p className="mt-2 text-[11px] text-slate-500">Within SLO</p>
-              </div>
-            ))}
+            {["Latence P95", "Perte de paquets", "Pression disque"].map(
+              (label, i) => (
+                <div
+                  key={label}
+                  className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4"
+                >
+                  <p className="text-xs text-slate-500">{label}</p>
+                  <p className="mt-2 text-2xl font-semibold text-white">
+                    {i === 0
+                      ? `${18 + (nodes.length % 7)} ms`
+                      : i === 1
+                        ? `${(0.02).toFixed(2)}%`
+                        : "Faible"}
+                  </p>
+                  <p className="mt-2 text-[11px] text-slate-500">Dans le SLO</p>
+                </div>
+              ),
+            )}
           </div>
         </Card>
         <Card>
-          <CardHeader title="Mobile view" subtitle="Simplified monitoring" />
+          <CardHeader title="Vue mobile" subtitle="Supervision simplifiée" />
           <div className="space-y-3">
             {nodes.slice(0, 4).map((n) => (
               <div
@@ -170,7 +172,7 @@ export function NodesPage() {
                     {n.label}
                   </p>
                   <p className="text-[11px] text-slate-500">
-                    {n.enabled ? `${n.latencyMs} ms` : "offline"}
+                    {n.enabled ? `${n.latencyMs} ms` : "hors ligne"}
                   </p>
                 </div>
                 <Cpu className="h-4 w-4 text-slate-500" />
@@ -199,20 +201,20 @@ export function NodesPage() {
             >
               <div className="flex items-start justify-between gap-3 border-b border-white/[0.06] p-6">
                 <div className="min-w-0">
-                  <p className="text-xs text-slate-500">Node detail</p>
+                  <p className="text-xs text-slate-500">Détail du nœud</p>
                   <p className="truncate text-lg font-semibold text-white">
                     {selected.label}
                   </p>
                   <p className="text-xs text-slate-500">{selected.region}</p>
                 </div>
                 <Button variant="secondary" onClick={() => setSelected(null)}>
-                  Close
+                  Fermer
                 </Button>
               </div>
               <div className="scrollbar-thin max-h-[calc(100vh-220px)] space-y-6 overflow-y-auto p-6">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Connected peers
+                    Pairs connectés
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {selected.peers.map((p) => (
@@ -227,7 +229,7 @@ export function NodesPage() {
                 </div>
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Objects stored
+                    Objets stockés
                   </p>
                   <div className="mt-3 space-y-2">
                     {filesOnNode.length ? (
@@ -239,23 +241,23 @@ export function NodesPage() {
                           <span className="truncate text-sm text-slate-200">
                             {f.name}
                           </span>
-                          <Badge variant="info">Hot</Badge>
+                          <Badge variant="info">Chaud</Badge>
                         </div>
                       ))
                     ) : (
                       <p className="text-sm text-slate-500">
-                        No replicas pinned to this node.
+                        Aucun réplica épinglé sur ce nœud.
                       </p>
                     )}
                   </div>
                 </div>
                 <div className="rounded-2xl border border-white/[0.06] bg-gradient-to-br from-cyan-500/10 to-violet-600/5 p-4">
                   <p className="text-sm font-medium text-slate-100">
-                    Failure simulation
+                    Simulation de panne
                   </p>
                   <p className="mt-1 text-xs text-slate-500">
-                    Toggles isolate the peer from the mesh without deleting
-                    metadata.
+                    Les interrupteurs isolent le pair du maillage sans supprimer
+                    les métadonnées.
                   </p>
                   <div className="mt-4 flex gap-2">
                     <Button
@@ -264,7 +266,7 @@ export function NodesPage() {
                       onClick={() => toggleNode(selected.id)}
                     >
                       <Power className="h-4 w-4" />
-                      Toggle ON/OFF
+                      Basculer Marche/Arrêt
                     </Button>
                   </div>
                 </div>

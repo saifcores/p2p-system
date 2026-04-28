@@ -18,6 +18,7 @@ import {
   type FileMetadataDto,
 } from "../api/p2pClient";
 import { P2P_NODE_URLS, TARGET_REPLICAS } from "../config";
+import { APP_LOCALE } from "../locale";
 import { formatBytes } from "../utils/formatBytes";
 import { normalizeStoredAt } from "../utils/storedAt";
 import { MeshDataContext } from "./meshContext";
@@ -242,7 +243,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           updatedAt: normalizeStoredAt(v.meta.storedAt),
         };
       });
-      meshFiles.sort((a, b) => a.name.localeCompare(b.name));
+      meshFiles.sort((a, b) => a.name.localeCompare(b.name, APP_LOCALE));
 
       const edgeList: GraphEdge[] = [];
       const idSet = new Set(uniqueNodes.map((n) => n.id));
@@ -277,8 +278,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
           channel: "request",
           message:
             ok.length === 0
-              ? `cluster poll · no nodes reachable (${results.length} tried)`
-              : `cluster poll · ${ok.length}/${allBaseUrls.length} nodes UP · ${meshFiles.length} unique objects`,
+              ? `scrutation du cluster · aucun nœud joignable (${results.length} testés)`
+              : `scrutation · ${ok.length}/${allBaseUrls.length} nœuds actifs · ${meshFiles.length} objets distincts`,
         };
         return [line, ...prev].slice(0, 200);
       });
@@ -295,7 +296,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         results.push({
           kind: "fail",
           baseUrl: base,
-          message: "disabled (simulated outage)",
+          message: "désactivé (panne simulée)",
         });
         continue;
       }
@@ -330,7 +331,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const anyOk = results.some((r) => r.kind === "ok");
     if (!anyOk && results.length > 0) {
       setRefreshError(
-        "No peers responded. Start Spring Boot nodes and check CORS / URLs.",
+        "Aucun pair n’a répondu. Démarrez les nœuds Spring Boot et vérifiez le CORS / les URL.",
       );
     }
     setLoading(false);
@@ -379,8 +380,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const ingress = pickIngress();
       if (!ingress) {
         pushToast({
-          title: "No reachable node",
-          description: "Start at least one Spring Boot peer.",
+          title: "Aucun nœud joignable",
+          description: "Démarrez au moins un pair Spring Boot.",
           variant: "error",
         });
         return;
@@ -388,11 +389,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
       try {
         await apiUpload(ingress.baseUrl, file.name, file, false);
         addActivity(
-          `Stored ${file.name} (${formatBytes(file.size)}) on ${ingress.label}`,
+          `${file.name} stocké (${formatBytes(file.size)}) sur ${ingress.label}`,
           "transfer",
         );
         pushToast({
-          title: "Upload accepted",
+          title: "Envoi accepté",
           description: file.name,
           variant: "success",
         });
@@ -414,7 +415,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         void refresh();
       } catch (e) {
         pushToast({
-          title: "Upload failed",
+          title: "Échec de l’envoi",
           description: e instanceof Error ? e.message : String(e),
           variant: "error",
         });
@@ -431,24 +432,24 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const blob = new Blob([buf]);
       const ingress = pickIngress();
       if (!ingress) {
-        pushToast({ title: "No reachable node", variant: "error" });
+        pushToast({ title: "Aucun nœud joignable", variant: "error" });
         return;
       }
       try {
         await apiUpload(ingress.baseUrl, name, blob, false);
         addActivity(
-          `Stored ${name} (${formatBytes(cap)}) on ${ingress.label}`,
+          `${name} stocké (${formatBytes(cap)}) sur ${ingress.label}`,
           "transfer",
         );
         pushToast({
-          title: "Upload accepted",
+          title: "Envoi accepté",
           description: name,
           variant: "success",
         });
         void refresh();
       } catch (e) {
         pushToast({
-          title: "Upload failed",
+          title: "Échec de l’envoi",
           description: e instanceof Error ? e.message : String(e),
           variant: "error",
         });
@@ -463,7 +464,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const holderId = f?.replicaNodes[0];
       const n = holderId ? nodes.find((x) => x.id === holderId) : pickIngress();
       if (!n) {
-        pushToast({ title: "No node to download from", variant: "error" });
+        pushToast({
+          title: "Aucun nœud pour télécharger",
+          variant: "error",
+        });
         return;
       }
       try {
@@ -473,10 +477,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         a.download = filename;
         a.click();
         URL.revokeObjectURL(a.href);
-        addActivity(`Downloaded ${filename} from ${n.label}`, "transfer");
+        addActivity(`Téléchargé ${filename} depuis ${n.label}`, "transfer");
       } catch (e) {
         pushToast({
-          title: "Download failed",
+          title: "Échec du téléchargement",
           description: e instanceof Error ? e.message : String(e),
           variant: "error",
         });
@@ -487,7 +491,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const addPeer = useCallback(() => {
     const raw = window.prompt(
-      "Peer base URL (Spring Boot) — must be reachable from this browser",
+      "URL de base du pair (Spring Boot) — doit être joignable depuis ce navigateur",
       "http://localhost:5013",
     );
     if (!raw) return;
@@ -499,7 +503,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
         if (allBaseUrls.some((u) => normalizeBaseUrl(u) === normalizedNew)) {
           pushToast({
-            title: "Already in mesh",
+            title: "Déjà dans le maillage",
             description: normalizedNew,
             variant: "default",
           });
@@ -515,9 +519,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
             prev.includes(normalizedNew) ? prev : [...prev, normalizedNew],
           );
           pushToast({
-            title: "Peer saved for later",
+            title: "Pair enregistré pour plus tard",
             description:
-              "Start a Spring Boot node, then use Add peer again to register.",
+              "Démarrez un nœud Spring Boot puis refaites « Ajouter un pair » pour finaliser.",
             variant: "default",
           });
           return;
@@ -538,7 +542,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           const msg =
             first?.status === "rejected" && first.reason instanceof Error
               ? first.reason.message
-              : "no node accepted registration";
+              : "aucun nœud n’a accepté l’enregistrement";
           throw new Error(msg);
         }
 
@@ -564,26 +568,26 @@ export function DataProvider({ children }: { children: ReactNode }) {
         );
 
         addActivity(
-          `Mesh: ${normalizedNew} registered on ${forwardOk}/${targets.length} node(s); reverse ${reverseOk}/${clusterMembers.length}`,
+          `Maillage : ${normalizedNew} enregistré sur ${forwardOk}/${targets.length} nœud(s) ; sens inverse ${reverseOk}/${clusterMembers.length}`,
           "health",
         );
 
         if (clusterMembers.length > 0 && reverseOk === 0) {
           pushToast({
-            title: "Half-mesh: start the new peer",
+            title: "Demi-maillage : démarrez le nouveau pair",
             description:
-              "Existing nodes know this URL. Start the new JVM and click Add peer again to finish linking.",
+              "Les nœuds existants connaissent cette URL. Démarrez la nouvelle JVM puis refaites « Ajouter un pair » pour terminer.",
             variant: "default",
           });
         } else if (forwardOk < targets.length) {
           pushToast({
-            title: "Partial registration",
-            description: `${forwardOk}/${targets.length} nodes updated. Check offline simulators.`,
+            title: "Enregistrement partiel",
+            description: `${forwardOk}/${targets.length} nœuds mis à jour. Vérifiez les simulateurs hors ligne.`,
             variant: "default",
           });
         } else {
           pushToast({
-            title: "Peer registered",
+            title: "Pair enregistré",
             description: normalizedNew,
             variant: "success",
           });
@@ -591,7 +595,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         void refresh();
       } catch (e) {
         pushToast({
-          title: "Register failed",
+          title: "Échec de l’enregistrement",
           description: e instanceof Error ? e.message : String(e),
           variant: "error",
         });
@@ -626,14 +630,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
           setDisabledBaseUrls((prev) => prev.filter((b) => b !== url));
           lastKnownRef.current.delete(url);
           pushToast({
-            title: "Peer removed from mesh",
+            title: "Pair retiré du maillage",
             description: target.label,
             variant: "default",
           });
           void refresh();
         } catch (e) {
           pushToast({
-            title: "Remove failed",
+            title: "Échec du retrait",
             description: e instanceof Error ? e.message : String(e),
             variant: "error",
           });
@@ -654,13 +658,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
       );
       pushToast({
         title: wasDisabled
-          ? "Node re-enabled (polling)"
-          : "Node drained (simulated)",
+          ? "Nœud réactivé (scrutation)"
+          : "Nœud vidé (simulation)",
         description: n.label,
         variant: "default",
       });
       addActivity(
-        `Operator ${wasDisabled ? "enabled" : "disabled"} ${n.label}`,
+        `${wasDisabled ? "Réactivation" : "Désactivation"} opérateur — ${n.label}`,
         "health",
       );
     },
@@ -675,7 +679,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const source = nodes.find((n) => n.id === entry.sourceId);
         const target = nodes.find((n) => n.id === entry.targetId);
         if (!source || !target) {
-          pushToast({ title: "Source/target not in view", variant: "error" });
+          pushToast({
+            title: "Source ou cible absente",
+            variant: "error",
+          });
           return;
         }
         try {
@@ -687,14 +694,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
             ),
           );
           pushToast({
-            title: "Replication push ok",
+            title: "Réplication envoyée avec succès",
             description: entry.fileName,
             variant: "success",
           });
           void refresh();
         } catch (e) {
           pushToast({
-            title: "Retry failed",
+            title: "Nouvelle tentative échouée",
             description: e instanceof Error ? e.message : String(e),
             variant: "error",
           });
@@ -716,20 +723,23 @@ export function DataProvider({ children }: { children: ReactNode }) {
             ? nodes.find((n) => n.id === sourceId)
             : undefined;
           if (!source) {
-            pushToast({ title: "No replica to copy from", variant: "error" });
+            pushToast({
+              title: "Aucun réplica source",
+              variant: "error",
+            });
             return;
           }
           const blob = await apiDownload(source.baseUrl, file.name);
           await apiUpload(ingress.baseUrl, file.name, blob, false);
           pushToast({
-            title: "Fan-out triggered",
+            title: "Diffusion déclenchée",
             description: file.name,
             variant: "success",
           });
           void refresh();
         } catch (e) {
           pushToast({
-            title: "Replicate failed",
+            title: "Échec de la réplication",
             description: e instanceof Error ? e.message : String(e),
             variant: "error",
           });

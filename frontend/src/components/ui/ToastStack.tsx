@@ -37,7 +37,7 @@ export function ToastStack() {
                 type="button"
                 onClick={() => dismissToast(t.id)}
                 className="rounded-lg p-1 text-slate-500 hover:bg-white/5 hover:text-slate-200"
-                aria-label="Dismiss"
+                aria-label="Fermer"
               >
                 <X className="h-4 w-4" />
               </button>

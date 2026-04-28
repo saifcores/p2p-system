@@ -7,11 +7,11 @@ import type { MeshNode } from "../../types";
 
 function statusBadge(n: MeshNode) {
   if (!n.enabled || n.status === "offline")
-    return <Badge variant="muted">Offline</Badge>;
-  if (n.status === "degraded") return <Badge variant="warning">Degraded</Badge>;
+    return <Badge variant="muted">Hors ligne</Badge>;
+  if (n.status === "degraded") return <Badge variant="warning">Dégradé</Badge>;
   return (
     <Badge variant="success" dot>
-      Online
+      En ligne
     </Badge>
   );
 }
@@ -22,7 +22,7 @@ export function NodeStatusCards() {
   if (loading) {
     return (
       <Card>
-        <CardHeader title="Node pulse" subtitle="Latency and capacity" />
+        <CardHeader title="Pouls des nœuds" subtitle="Latence et capacité" />
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-24 w-full rounded-2xl" />
@@ -35,8 +35,8 @@ export function NodeStatusCards() {
   return (
     <Card>
       <CardHeader
-        title="Node pulse"
-        subtitle="Latency, storage, and peer links"
+        title="Pouls des nœuds"
+        subtitle="Latence, stockage et liens pair-à-pair"
       />
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {nodes.map((n, i) => (
@@ -58,7 +58,7 @@ export function NodeStatusCards() {
             </div>
             <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
               <div>
-                <p className="text-slate-500">Latency</p>
+                <p className="text-slate-500">Latence</p>
                 <p className="mt-0.5 font-mono text-slate-200">
                   {n.enabled && n.status !== "offline"
                     ? `${n.latencyMs} ms`
@@ -66,7 +66,7 @@ export function NodeStatusCards() {
                 </p>
               </div>
               <div>
-                <p className="text-slate-500">Storage</p>
+                <p className="text-slate-500">Stockage</p>
                 <p className="mt-0.5 font-mono text-slate-200">
                   {n.storageUsedPct}%
                 </p>

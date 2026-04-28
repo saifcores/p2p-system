@@ -1,15 +1,16 @@
 import { useMemo } from "react";
 import { useMeshData } from "../context/useMeshData";
+import { formatTimeUi } from "../locale";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { Card, CardHeader } from "../components/ui/Card";
 import type { LogFilter } from "../types";
 
 const filters: { id: LogFilter; label: string }[] = [
-  { id: "all", label: "All" },
-  { id: "replication", label: "Replication" },
-  { id: "errors", label: "Errors" },
-  { id: "requests", label: "Requests" },
+  { id: "all", label: "Tous" },
+  { id: "replication", label: "Réplication" },
+  { id: "errors", label: "Erreurs" },
+  { id: "requests", label: "Requêtes" },
 ];
 
 export function LogsPage() {
@@ -30,8 +31,8 @@ export function LogsPage() {
     <div className="grid gap-6 xl:grid-cols-3">
       <Card className="xl:col-span-2">
         <CardHeader
-          title="Live stream"
-          subtitle="Structured logs · 200 line ring buffer"
+          title="Flux en direct"
+          subtitle="Journaux structurés · tampon circulaire 200 lignes"
           action={
             <div className="flex flex-wrap gap-2">
               {filters.map((f) => (
@@ -51,13 +52,13 @@ export function LogsPage() {
           <div className="flex items-center justify-between border-b border-white/[0.06] px-4 py-2">
             <div className="flex items-center gap-2 text-[11px] text-slate-500">
               <span className="h-2 w-2 rounded-full bg-emerald-400" />
-              streaming
+              en direct
             </div>
-            <span className="font-mono text-[11px] text-slate-600">UTC</span>
+            <span className="font-mono text-[11px] text-slate-600">local</span>
           </div>
           <div className="scrollbar-thin max-h-[min(560px,52vh)] overflow-y-auto p-4 font-mono text-[12px] leading-relaxed">
             {loading ? (
-              <p className="text-slate-500">Connecting to log tail…</p>
+              <p className="text-slate-500">Connexion au flux de journaux…</p>
             ) : (
               filtered.map((l) => (
                 <div
@@ -65,7 +66,7 @@ export function LogsPage() {
                   className="flex gap-3 border-b border-white/[0.03] py-2 last:border-0"
                 >
                   <span className="shrink-0 text-slate-600">
-                    {new Date(l.at).toLocaleTimeString()}
+                    {formatTimeUi(l.at)}
                   </span>
                   <span
                     className={`shrink-0 ${
@@ -93,7 +94,10 @@ export function LogsPage() {
 
       <div className="space-y-6">
         <Card>
-          <CardHeader title="Timeline" subtitle="Event density (mock)" />
+          <CardHeader
+            title="Chronologie"
+            subtitle="Densité d’événements (mock)"
+          />
           <div className="space-y-4">
             {[72, 48, 88, 40].map((h, i) => (
               <div key={i} className="flex items-end gap-2">
@@ -106,7 +110,7 @@ export function LogsPage() {
                 <div className="pb-1 text-[11px] text-slate-500">
                   T-{3 - i}m
                   <div className="text-xs text-slate-300">
-                    {(h * 1.2).toFixed(0)} evt/s
+                    {(h * 1.2).toFixed(0)} év./s
                   </div>
                 </div>
               </div>
@@ -115,18 +119,21 @@ export function LogsPage() {
         </Card>
 
         <Card>
-          <CardHeader title="Noise budget" subtitle="Sampling and retention" />
+          <CardHeader
+            title="Budget de bruit"
+            subtitle="Échantillonnage et rétention"
+          />
           <div className="space-y-3 text-sm text-slate-300">
             <div className="flex items-center justify-between">
-              <span className="text-slate-500">Trace sampling</span>
+              <span className="text-slate-500">Échantillonnage trace</span>
               <Badge variant="info">12%</Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-500">Error capture</span>
+              <span className="text-slate-500">Capture d’erreurs</span>
               <Badge variant="success">100%</Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-500">Hot retention</span>
+              <span className="text-slate-500">Rétention à chaud</span>
               <span className="font-mono text-xs text-slate-400">6h</span>
             </div>
           </div>

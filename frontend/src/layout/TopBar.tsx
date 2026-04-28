@@ -31,7 +31,7 @@ export function TopBar({
           type="button"
           onClick={onMenu}
           className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-slate-200 ring-1 ring-white/10 lg:hidden"
-          aria-label="Open menu"
+          aria-label="Ouvrir le menu"
         >
           <Menu className="h-5 w-5" />
         </button>
@@ -56,9 +56,9 @@ export function TopBar({
             type="button"
             onClick={() => void onRefresh()}
             disabled={refreshing}
-            title="Refresh cluster data"
+            title="Actualiser les données du cluster"
             className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-slate-300 ring-1 ring-white/10 transition hover:bg-white/[0.08] disabled:pointer-events-none disabled:opacity-50"
-            aria-label="Refresh cluster data"
+            aria-label="Actualiser les données du cluster"
           >
             <RefreshCw
               className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
@@ -68,7 +68,7 @@ export function TopBar({
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
             <input
               readOnly
-              placeholder="Search nodes, files, hashes…"
+              placeholder="Rechercher nœuds, fichiers, empreintes…"
               className="h-10 w-[min(320px,28vw)] rounded-xl border border-white/[0.08] bg-white/[0.03] pl-10 pr-4 text-sm text-slate-200 placeholder:text-slate-600 outline-none ring-0 focus:border-cyan-500/40"
             />
           </div>
@@ -90,7 +90,7 @@ export function TopBar({
             <p
               className={`text-xs font-semibold ${healthy ? "text-emerald-200" : "text-amber-100"}`}
             >
-              {healthy ? "Healthy" : "Degraded"}
+              {healthy ? "Sain" : "Dégradé"}
             </p>
           </div>
         </div>

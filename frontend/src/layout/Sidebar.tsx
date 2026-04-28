@@ -11,11 +11,11 @@ import {
 import { NavLink } from "react-router-dom";
 
 const items = [
-  { to: "/", label: "Overview", icon: LayoutDashboard, end: true },
-  { to: "/files", label: "Files", icon: FileStack },
-  { to: "/nodes", label: "Nodes", icon: Network },
-  { to: "/replication", label: "Replication", icon: GitBranch },
-  { to: "/logs", label: "Logs", icon: Activity },
+  { to: "/", label: "Vue d’ensemble", icon: LayoutDashboard, end: true },
+  { to: "/files", label: "Fichiers", icon: FileStack },
+  { to: "/nodes", label: "Nœuds", icon: Network },
+  { to: "/replication", label: "Réplication", icon: GitBranch },
+  { to: "/logs", label: "Journaux", icon: Activity },
 ];
 
 export function Sidebar({
@@ -35,7 +35,9 @@ export function Sidebar({
           <p className="truncate text-sm font-semibold tracking-tight text-white">
             P2P Mesh
           </p>
-          <p className="truncate text-[11px] text-slate-500">Control plane</p>
+          <p className="truncate text-[11px] text-slate-500">
+            Plan de contrôle
+          </p>
         </div>
       </div>
       {items.map(({ to, label, icon: Icon, end }) => (
@@ -58,12 +60,15 @@ export function Sidebar({
         </NavLink>
       ))}
       <div className="mt-auto rounded-2xl border border-white/[0.06] bg-gradient-to-br from-cyan-500/10 to-violet-600/10 p-4">
-        <p className="text-xs font-medium text-slate-200">Replication factor</p>
+        <p className="text-xs font-medium text-slate-200">
+          Facteur de réplication
+        </p>
         <p className="mt-1 text-2xl font-semibold tracking-tight text-white">
           3×
         </p>
         <p className="mt-2 text-[11px] leading-relaxed text-slate-400">
-          Quorum writes across availability zones. Fault tolerance: 1 node.
+          Écritures en quorum entre zones de disponibilité. Tolérance de panne :
+          1 nœud.
         </p>
       </div>
     </nav>
@@ -84,7 +89,7 @@ export function Sidebar({
               exit={{ opacity: 0 }}
               className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
               onClick={onClose}
-              aria-label="Close menu"
+              aria-label="Fermer le menu"
             />
             <motion.aside
               initial={{ x: -280 }}

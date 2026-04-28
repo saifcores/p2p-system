@@ -4,29 +4,32 @@ import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
 
 const titles: Record<string, { title: string; subtitle?: string }> = {
-  "/": { title: "Dashboard", subtitle: "Live mesh topology and fleet health" },
+  "/": {
+    title: "Tableau de bord",
+    subtitle: "Topologie du maillage et état du parc en direct",
+  },
   "/files": {
-    title: "File manager",
-    subtitle: "Objects, replicas, and distribution",
+    title: "Gestionnaire de fichiers",
+    subtitle: "Objets, réplicas et répartition",
   },
   "/nodes": {
-    title: "Nodes",
-    subtitle: "Peers, capacity, and failure simulation",
+    title: "Nœuds",
+    subtitle: "Pairs, capacité et simulation de pannes",
   },
   "/replication": {
-    title: "Replication",
-    subtitle: "Fan-out paths and retry controls",
+    title: "Réplication",
+    subtitle: "Diffusion multi-cibles et contrôles de nouvelle tentative",
   },
   "/logs": {
-    title: "Logs & monitoring",
-    subtitle: "Structured stream with filters",
+    title: "Journaux et supervision",
+    subtitle: "Flux structurés avec filtres",
   },
 };
 
 export function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const loc = useLocation();
-  const meta = titles[loc.pathname] ?? { title: "P2P Mesh" };
+  const meta = titles[loc.pathname] ?? { title: "Maillage P2P" };
 
   return (
     <div className="flex min-h-screen">

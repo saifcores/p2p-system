@@ -9,30 +9,30 @@ export function MetricStrip() {
 
   const items = [
     {
-      label: "Total nodes",
+      label: "Nœuds (total)",
       value: metrics.totalNodes,
-      hint: `${metrics.onlineNodes} online`,
+      hint: `${metrics.onlineNodes} en ligne`,
       icon: Server,
       accent: "from-cyan-500/20 to-blue-600/10",
     },
     {
-      label: "Total files",
+      label: "Fichiers (total)",
       value: metrics.totalFiles,
-      hint: "Indexed objects",
+      hint: "Objets indexés",
       icon: Boxes,
       accent: "from-violet-500/20 to-cyan-500/10",
     },
     {
-      label: "Replication factor",
+      label: "Facteur de réplication",
       value: metrics.replicationFactor,
-      hint: "Avg replicas / object",
+      hint: "Réplicas / objet (moy.)",
       icon: Copy,
       accent: "from-fuchsia-500/15 to-cyan-500/10",
     },
     {
-      label: "Failed nodes",
+      label: "Nœuds en échec",
       value: metrics.failedNodes,
-      hint: metrics.failedNodes ? "Failover active" : "None",
+      hint: metrics.failedNodes ? "Basculement actif" : "Aucun",
       icon: AlertTriangle,
       accent: "from-amber-500/15 to-rose-500/10",
     },

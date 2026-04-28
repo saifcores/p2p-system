@@ -40,18 +40,20 @@ export function NetworkGraph() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(34,211,238,0.08),transparent_50%)]" />
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-white">Live topology</p>
-          <p className="text-xs text-slate-500">Gossip edges · last 30s</p>
+          <p className="text-sm font-semibold text-white">
+            Topologie en direct
+          </p>
+          <p className="text-xs text-slate-500">Arêtes gossip · 30 dern. s</p>
         </div>
         <div className="flex items-center gap-2 text-[11px] text-slate-400">
           <span className="inline-flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-cyan-400" /> Online
+            <span className="h-2 w-2 rounded-full bg-cyan-400" /> En ligne
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-amber-400" /> Degraded
+            <span className="h-2 w-2 rounded-full bg-amber-400" /> Dégradé
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-slate-500" /> Offline
+            <span className="h-2 w-2 rounded-full bg-slate-500" /> Hors ligne
           </span>
         </div>
       </div>

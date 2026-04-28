@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { AlertCircle, ArrowLeftRight, HeartPulse } from "lucide-react";
+import { formatTimeUi } from "../../locale";
 import { useMeshData } from "../../context/useMeshData";
 import { Card, CardHeader } from "../ui/Card";
 import type { ActivityType } from "../../types";
@@ -22,10 +23,10 @@ export function ActivityFeed() {
 
   return (
     <Card className="max-h-[520px] overflow-hidden">
-      <CardHeader title="Activity" subtitle="Replication, transfers, health" />
+      <CardHeader title="Activité" subtitle="Réplication, transferts, santé" />
       <div className="scrollbar-thin max-h-[440px] space-y-3 overflow-y-auto pr-1">
         {loading ? (
-          <p className="text-sm text-slate-500">Hydrating event stream…</p>
+          <p className="text-sm text-slate-500">Chargement du flux…</p>
         ) : (
           activity.map((a, idx) => {
             const Icon = iconFor(a.type);
@@ -43,7 +44,7 @@ export function ActivityFeed() {
                 <div className="min-w-0 flex-1">
                   <p className="text-sm text-slate-200">{a.message}</p>
                   <p className="mt-1 font-mono text-[11px] text-slate-500">
-                    {new Date(a.at).toLocaleTimeString()}
+                    {formatTimeUi(a.at)}
                   </p>
                 </div>
               </motion.div>

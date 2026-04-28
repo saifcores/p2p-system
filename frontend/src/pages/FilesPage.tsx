@@ -18,18 +18,18 @@ function fileStatusBadge(f: MeshFile) {
   if (f.status === "replicated")
     return (
       <Badge variant="success" dot>
-        Replicated
+        Répliqué
       </Badge>
     );
   if (f.status === "degraded")
     return (
       <Badge variant="warning" dot>
-        Missing replicas
+        Réplicas manquants
       </Badge>
     );
   return (
     <Badge variant="danger" dot>
-      Critical
+      Critique
     </Badge>
   );
 }
@@ -77,10 +77,11 @@ export function FilesPage() {
         >
           <UploadCloud className="mx-auto h-10 w-10 text-cyan-300/90" />
           <p className="mt-3 text-sm font-medium text-slate-100">
-            Drop objects to ingest
+            Déposez des objets à ingérer
           </p>
           <p className="mt-1 text-xs text-slate-500">
-            POSTs to the first reachable node; peers replicate asynchronously
+            POST vers le premier nœud joignable ; les pairs répliquent en
+            asynchrone
           </p>
           <input
             ref={fileInputRef}
@@ -99,7 +100,7 @@ export function FilesPage() {
               leftIcon={<UploadCloud className="h-4 w-4" />}
               onClick={() => fileInputRef.current?.click()}
             >
-              Choose file
+              Choisir un fichier
             </Button>
             <Button
               variant="primary"
@@ -108,7 +109,7 @@ export function FilesPage() {
                 simulateUpload(`upload-${Date.now()}.bin`, 8_388_608)
               }
             >
-              Upload sample (8 MiB)
+              Envoi exemple (8 Mio)
             </Button>
           </div>
         </div>
@@ -116,12 +117,12 @@ export function FilesPage() {
 
       <Card>
         <CardHeader
-          title="Objects"
-          subtitle="Replica coverage across the fleet"
+          title="Objets"
+          subtitle="Couverture des réplicas sur le parc"
           action={
             <Button variant="ghost" className="hidden sm:inline-flex">
               <LayoutGrid className="h-4 w-4" />
-              Distribution
+              Répartition
             </Button>
           }
         />
@@ -129,10 +130,10 @@ export function FilesPage() {
           <table className="w-full min-w-[720px] border-separate border-spacing-0">
             <thead>
               <tr className="text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                <th className="border-b border-white/[0.06] pb-3 pl-1">Name</th>
-                <th className="border-b border-white/[0.06] pb-3">Size</th>
-                <th className="border-b border-white/[0.06] pb-3">Replicas</th>
-                <th className="border-b border-white/[0.06] pb-3">Status</th>
+                <th className="border-b border-white/[0.06] pb-3 pl-1">Nom</th>
+                <th className="border-b border-white/[0.06] pb-3">Taille</th>
+                <th className="border-b border-white/[0.06] pb-3">Réplicas</th>
+                <th className="border-b border-white/[0.06] pb-3">État</th>
                 <th className="border-b border-white/[0.06] pb-3 pr-1 text-right">
                   Actions
                 </th>
@@ -145,7 +146,7 @@ export function FilesPage() {
                     colSpan={5}
                     className="py-10 text-center text-sm text-slate-500"
                   >
-                    Loading object index…
+                    Chargement de l’index d’objets…
                   </td>
                 </tr>
               ) : (
@@ -171,7 +172,7 @@ export function FilesPage() {
                       <span className="font-mono text-sm text-slate-200">
                         {f.replicaNodes.length}/{f.requiredReplicas}
                       </span>
-                      <span className="ml-2 text-xs text-slate-500">nodes</span>
+                      <span className="ml-2 text-xs text-slate-500">nœuds</span>
                     </td>
                     <td className="border-b border-white/[0.04] py-4">
                       {fileStatusBadge(f)}
@@ -191,7 +192,7 @@ export function FilesPage() {
                           onClick={() => triggerReplicate(f.id)}
                         >
                           <GitBranch className="h-4 w-4" />
-                          Replicate
+                          Répliquer
                         </Button>
                         <Button
                           size="sm"
@@ -227,7 +228,7 @@ export function FilesPage() {
               className="glass-panel-strong w-full max-w-lg rounded-2xl p-6"
             >
               <p className="text-sm font-semibold text-white">
-                Replica placement
+                Placement des réplicas
               </p>
               <p className="mt-1 text-xs text-slate-500">{detail.name}</p>
               <div className="mt-4 space-y-2">
@@ -239,19 +240,19 @@ export function FilesPage() {
                     <span className="font-mono text-xs text-slate-200">
                       {id}
                     </span>
-                    <Badge variant="success">Warm</Badge>
+                    <Badge variant="success">Chaud</Badge>
                   </div>
                 ))}
               </div>
               <div className="mt-5 flex justify-end gap-2">
                 <Button variant="secondary" onClick={() => setDetail(null)}>
-                  Close
+                  Fermer
                 </Button>
                 <Button
                   variant="primary"
                   onClick={() => detail && triggerReplicate(detail.id)}
                 >
-                  Force replicate
+                  Forcer la réplication
                 </Button>
               </div>
             </motion.div>
@@ -269,7 +270,7 @@ export function FilesPage() {
           simulateUpload(`quick-upload-${Date.now()}.tar`, 4_194_304)
         }
         className="fixed bottom-8 right-8 z-40 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 text-white shadow-xl shadow-cyan-500/20 ring-1 ring-white/20"
-        aria-label="Quick upload"
+        aria-label="Envoi rapide"
       >
         <UploadCloud className="h-6 w-6" />
       </motion.button>
