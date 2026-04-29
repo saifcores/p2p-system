@@ -1,12 +1,10 @@
-# Render Blueprint — https://render.com/docs/infrastructure-as-code
+# Render Blueprint — https://render.com/docs/blueprint-spec
 #
-# Deploy: Dashboard → New → Blueprint → point at this file.
+# New » Blueprint » sélectionner ce dépôt (render.yaml à la racine).
 #
-# Après le premier déploiement du backend, renseignez VITE_P2P_NODE_URLS
-# (URL HTTPS du service p2p-backend, sans slash final) puis redeployez le
-# site statique — les variables VITE_* sont figées au build.
-#
-# Multi-nœuds: dupliquez le service Docker et NODE_PEERS_0, NODE_PEERS_1, …
+# Après le premier déploiement du backend, ajoutez sur p2p-console la variable
+# VITE_P2P_NODE_URLS (URL HTTPS du backend, sans slash final), puis redeploy du
+# statique avec « Clear build cache » — les VITE_* sont figées au build npm.
 
 services:
   - type: web
@@ -23,17 +21,20 @@ services:
       - key: NODE_ID
         value: node-render-1
 
-  # Les sites statiques sont des services web avec runtime: static (pas staticSites).
+  # Ancienne clé `staticSites` n’est plus dans la spec : même bloc sous services,
+  # runtime `static`, champ obligatoire `staticPublishPath` (relatif à la racine git).
   - type: web
     name: p2p-console
     runtime: static
     region: frankfurt
     rootDir: frontend
     buildCommand: npm ci && npm run build
-    staticPublishPath: dist
+    staticPublishPath: ./frontend/dist
     envVars:
-      - key: VITE_P2P_NODE_URLS
-        sync: false
+      - key: NODE_VERSION
+        value: "22.14.0"
+      - key: VITE_TARGET_REPLICAS
+        value: "3"
     routes:
       - type: rewrite
         source: /*
