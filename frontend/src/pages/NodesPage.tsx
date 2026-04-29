@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Cpu, Power, Trash2, UserPlus } from "lucide-react";
+import { Cpu, Plug, Power, Trash2, UserPlus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useMeshData } from "../context/useMeshData";
 import { MESH_POLL_INTERVAL_MS } from "../config";
@@ -20,9 +20,33 @@ function nodeBadge(n: MeshNode) {
 }
 
 export function NodesPage() {
-  const { nodes, files, toggleNode, addPeer, removePeer, loading } =
-    useMeshData();
+  const {
+    nodes,
+    files,
+    toggleNode,
+    addPeer,
+    registerPeerUrl,
+    removePeer,
+    loading,
+  } = useMeshData();
   const [selected, setSelected] = useState<MeshNode | null>(null);
+  const [peerUrlInput, setPeerUrlInput] = useState("http://localhost:5013");
+  const [peerSubmitBusy, setPeerSubmitBusy] = useState(false);
+
+  function confirmRemovePeer(id: string) {
+    const target = nodes.find((n) => n.id === id);
+    if (
+      !target ||
+      typeof window === "undefined" ||
+      !window.confirm(
+        `Retirer « ${target.label} » du maillage et désinscrire cette URL ` +
+          `(${target.baseUrl}) sur les autres pairs ?`,
+      )
+    )
+      return;
+    removePeer(id);
+    setSelected((prev) => (prev?.id === id ? null : prev));
+  }
 
   const filesOnNode = useMemo(() => {
     if (!selected) return [];
@@ -31,21 +55,72 @@ export function NodesPage() {
 
   return (
     <div className="space-y-6">
+      {/* <Card>
+        <CardHeader
+          title="Ajouter un nœud au maillage"
+          subtitle="POST /internal/peers · enregistré sur les JVM existantes puis sens inverse si le nouveau pair est déjà UP"
+          action={
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="ghost"
+                leftIcon={<UserPlus className="h-4 w-4" />}
+                onClick={addPeer}
+                title="Saisie rapide via fenêtre système"
+              >
+                Invite rapide
+              </Button>
+            </div>
+          }
+        />
+        <form
+          className="flex flex-col gap-3 border-t border-white/[0.05] pt-4 sm:flex-row sm:items-end"
+          onSubmit={(e) => {
+            e.preventDefault();
+            setPeerSubmitBusy(true);
+            void (async () => {
+              try {
+                await registerPeerUrl(peerUrlInput);
+              } finally {
+                setPeerSubmitBusy(false);
+              }
+            })();
+          }}
+        >
+          <label className="min-w-0 flex-1">
+            <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+              URL de base HTTP(S)
+            </span>
+            <input
+              type="url"
+              name="peerUrl"
+              value={peerUrlInput}
+              onChange={(e) => setPeerUrlInput(e.target.value)}
+              placeholder="http://hostname:5013"
+              autoComplete="url"
+              className="h-11 w-full rounded-xl border border-white/[0.1] bg-white/[0.04] px-3 font-mono text-sm text-slate-100 outline-none placeholder:text-slate-600 focus:border-cyan-500/40 focus:ring-1 focus:ring-cyan-500/20"
+              disabled={peerSubmitBusy}
+            />
+          </label>
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={peerSubmitBusy || peerUrlInput.trim() === ""}
+            leftIcon={<Plug className="h-4 w-4" />}
+          >
+            Enregistrer le pair
+          </Button>
+        </form>
+        <p className="mt-3 text-[11px] leading-relaxed text-slate-500">
+          L’interface doit pouvoir joindre cette URL (CORS, même origine ou
+          proxy). Les nœuds listés dans <code>VITE_P2P_NODE_URLS</code> peuvent
+          être retirés du tableau tout en gardant leur JVM sous tension.
+        </p>
+      </Card> */}
+
       <Card>
         <CardHeader
           title="Parc"
           subtitle="Pilotage opérateur · simulation de pannes en sécurité"
-          action={
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="secondary"
-                leftIcon={<UserPlus className="h-4 w-4" />}
-                onClick={addPeer}
-              >
-                Ajouter un pair
-              </Button>
-            </div>
-          }
         />
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] border-separate border-spacing-0">
@@ -118,10 +193,12 @@ export function NodesPage() {
                         <Button
                           size="sm"
                           variant="danger"
-                          onClick={() => removePeer(n.id)}
-                          aria-label="Retirer le pair"
+                          onClick={() => confirmRemovePeer(n.id)}
+                          aria-label="Retirer le pair du maillage"
+                          title="Supprimer cette URL du contrôle UI et désinscrire les autres nœuds"
                         >
                           <Trash2 className="h-4 w-4" />
+                          <span className="hidden sm:inline">Retirer</span>
                         </Button>
                       </div>
                     </td>
@@ -207,6 +284,9 @@ export function NodesPage() {
                     {selected.label}
                   </p>
                   <p className="text-xs text-slate-500">{selected.region}</p>
+                  <p className="mt-2 break-all font-mono text-[11px] text-cyan-200/75">
+                    {selected.baseUrl}
+                  </p>
                 </div>
                 <Button variant="secondary" onClick={() => setSelected(null)}>
                   Fermer
@@ -260,7 +340,7 @@ export function NodesPage() {
                     Les interrupteurs isolent le pair du maillage sans supprimer
                     les métadonnées.
                   </p>
-                  <div className="mt-4 flex gap-2">
+                  <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                     <Button
                       className="flex-1"
                       variant="secondary"
@@ -268,6 +348,14 @@ export function NodesPage() {
                     >
                       <Power className="h-4 w-4" />
                       Basculer Marche/Arrêt
+                    </Button>
+                    <Button
+                      className="flex-1"
+                      variant="danger"
+                      leftIcon={<Trash2 className="h-4 w-4" />}
+                      onClick={() => confirmRemovePeer(selected.id)}
+                    >
+                      Retirer ce pair
                     </Button>
                   </div>
                 </div>

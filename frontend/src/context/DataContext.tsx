@@ -513,18 +513,33 @@ export function DataProvider({ children }: { children: ReactNode }) {
     [addActivity, files, nodes, pickIngress, pushToast],
   );
 
-  const addPeer = useCallback(() => {
-    const raw = window.prompt(
-      "URL de base du pair (Spring Boot) — doit être joignable depuis ce navigateur",
-      "http://localhost:5013",
-    );
-    if (!raw) return;
-    const url = normalizeBaseUrl(raw);
-
-    void (async () => {
+  const registerPeerUrl = useCallback(
+    async (rawInput: string) => {
+      const trimmed = rawInput.trim();
+      if (!trimmed) {
+        pushToast({
+          title: "URL vide",
+          description:
+            "Entrez une URL de base joignable (ex. http://localhost:5013).",
+          variant: "error",
+        });
+        return;
+      }
       try {
-        const normalizedNew = url;
+        new URL(trimmed.includes("://") ? trimmed : `http://${trimmed}`);
+      } catch {
+        pushToast({
+          title: "URL invalide",
+          description: "Utilisez un schéma http(s) avec hôte et port.",
+          variant: "error",
+        });
+        return;
+      }
+      const normalizedNew = normalizeBaseUrl(
+        trimmed.includes("://") ? trimmed : `http://${trimmed}`,
+      );
 
+      try {
         if (allBaseUrls.some((u) => normalizeBaseUrl(u) === normalizedNew)) {
           pushToast({
             title: "Déjà dans le maillage",
@@ -545,7 +560,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           pushToast({
             title: "Pair enregistré pour plus tard",
             description:
-              "Démarrez un nœud Spring Boot puis refaites « Ajouter un pair » pour finaliser.",
+              "Démarrez un nœud Spring Boot puis refaites l’ajout pour finaliser.",
             variant: "default",
           });
           return;
@@ -600,7 +615,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           pushToast({
             title: "Demi-maillage : démarrez le nouveau pair",
             description:
-              "Les nœuds existants connaissent cette URL. Démarrez la nouvelle JVM puis refaites « Ajouter un pair » pour terminer.",
+              "Les nœuds existants connaissent cette URL. Démarrez la JVM cible puis refaites l’ajout pour terminer.",
             variant: "default",
           });
         } else if (forwardOk < targets.length) {
@@ -624,8 +639,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
           variant: "error",
         });
       }
-    })();
-  }, [addActivity, allBaseUrls, nodes, pushToast, refresh]);
+    },
+    [addActivity, allBaseUrls, nodes, pushToast, refresh],
+  );
+
+  const addPeer = useCallback(() => {
+    const raw = window.prompt(
+      "URL de base du pair (Spring Boot) — doit être joignable depuis ce navigateur",
+      "http://localhost:5013",
+    );
+    if (raw != null && raw.trim() !== "") {
+      void registerPeerUrl(raw);
+    }
+  }, [registerPeerUrl]);
 
   const removePeer = useCallback(
     (nodeId: string) => {
@@ -793,6 +819,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     metrics,
     toggleNode,
     addPeer,
+    registerPeerUrl,
     removePeer,
     retryReplication,
     triggerReplicate,

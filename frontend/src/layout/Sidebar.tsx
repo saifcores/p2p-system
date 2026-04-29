@@ -34,7 +34,7 @@ export function Sidebar({
         </div>
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold tracking-tight text-white">
-            P2P Mesh
+            P2P Sharing
           </p>
           <p className="truncate text-[11px] text-slate-500">
             Plan de contrôle
@@ -60,6 +60,17 @@ export function Sidebar({
           <span className="font-medium">{label}</span>
         </NavLink>
       ))}
+      <p className="mt-4 px-2 text-[11px] leading-relaxed text-slate-500">
+        Pour <span className="text-slate-400">ajouter ou retirer</span> une JVM
+        du maillage suivie, ouvrez la page&nbsp;
+        <NavLink
+          to="/nodes"
+          className="font-medium text-cyan-400/95 hover:text-cyan-300 hover:underline"
+        >
+          Nœuds
+        </NavLink>
+        .
+      </p>
       <div className="mt-auto rounded-2xl border border-white/[0.06] bg-gradient-to-br from-cyan-500/10 to-violet-600/10 p-4">
         <p className="text-xs font-medium text-slate-200">
           Facteur de réplication

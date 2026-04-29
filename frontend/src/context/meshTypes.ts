@@ -33,7 +33,10 @@ export interface DataContextValue {
     replicationFactor: number;
   };
   toggleNode: (id: string) => void;
+  /** Ouvre une invite de saisie (rapide). */
   addPeer: () => void;
+  /** Ajoute ou refait joindre un pair au maillage avec une URL connue (sans prompt). */
+  registerPeerUrl: (rawUrl: string) => Promise<void>;
   removePeer: (id: string) => void;
   retryReplication: (id: string) => void;
   triggerReplicate: (fileId: string) => void;
