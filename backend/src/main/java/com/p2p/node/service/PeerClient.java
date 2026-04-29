@@ -59,8 +59,8 @@ public class PeerClient {
         try {
             ResponseEntity<byte[]> response = peerRestTemplate.exchange(url, HttpMethod.GET, null, byte[].class);
             byte[] body = response.getBody();
-            if (body == null || body.length == 0) {
-                log.warn("[node={}] Peer returned empty body: {}", nodeConfig.getId(), url);
+            if (body == null) {
+                log.warn("[node={}] Peer returned null body: {}", nodeConfig.getId(), url);
                 return Optional.empty();
             }
             return Optional.of(body);

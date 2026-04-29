@@ -35,16 +35,21 @@ public class FileController {
     public ResponseEntity<FileMetadata> upload(
             @PathVariable("filename") String filename,
             @RequestHeader(value = "X-Replicated", defaultValue = "false") String replicatedHeader,
-            @RequestBody byte[] body) {
+            @RequestBody(required = false) byte[] body) {
+        byte[] data = body == null ? new byte[0] : body;
         boolean replicated = parseBooleanHeader(replicatedHeader);
-        FileMetadata meta = fileService.saveFile(filename, body, replicated);
+        FileMetadata meta = fileService.saveFile(filename, data, replicated);
         return ResponseEntity.ok(meta);
     }
 
     /**
      * Download: local first, then sequential peer search.
      */
-    @GetMapping(value = "/files/{filename:.+}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    /**
+     * No {@code produces} so clients may use {@code Accept: application/json} on
+     * missing files.
+     */
+    @GetMapping(value = "/files/{filename:.+}")
     public ResponseEntity<byte[]> download(@PathVariable("filename") String filename) {
         byte[] data = fileService.getFileBytes(filename);
         return ResponseEntity.ok()

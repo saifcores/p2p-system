@@ -41,8 +41,12 @@ public class FileService {
     @PostConstruct
     void initStorage() throws IOException {
         storageDirectory = Path.of(nodeConfig.getStorage()).toAbsolutePath().normalize();
-        Files.createDirectories(storageDirectory);
+        ensureStorageDir();
         log.info("[node={}] Local storage ready at {}", nodeConfig.getId(), storageDirectory);
+    }
+
+    private void ensureStorageDir() throws IOException {
+        Files.createDirectories(storageDirectory);
     }
 
     /**
@@ -113,6 +117,11 @@ public class FileService {
     }
 
     public List<FileMetadata> listLocalFiles() {
+        try {
+            ensureStorageDir();
+        } catch (IOException e) {
+            throw new IllegalStateException("cannot prepare storage dir", e);
+        }
         try (Stream<Path> stream = Files.list(storageDirectory)) {
             return stream
                     .filter(Files::isRegularFile)
@@ -141,6 +150,7 @@ public class FileService {
     private FileMetadata writeToDisk(String filename, byte[] data) {
         Path path = storageDirectory.resolve(filename);
         try {
+            ensureStorageDir();
             Files.write(path, data);
             String hash = FileUtils.sha256Hex(data);
             Instant storedAt = Files.getLastModifiedTime(path).toInstant();
