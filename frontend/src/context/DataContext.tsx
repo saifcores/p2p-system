@@ -17,7 +17,11 @@ import {
   uploadFile as apiUpload,
   type FileMetadataDto,
 } from "../api/p2pClient";
-import { P2P_NODE_URLS, TARGET_REPLICAS } from "../config";
+import {
+  MESH_POLL_INTERVAL_MS,
+  P2P_NODE_URLS,
+  TARGET_REPLICAS,
+} from "../config";
 import { APP_LOCALE } from "../locale";
 import { formatBytes } from "../utils/formatBytes";
 import { normalizeStoredAt } from "../utils/storedAt";
@@ -34,10 +38,29 @@ import type {
   ReplicationEntry,
 } from "../types";
 
-const POLL_MS = 4000;
-
 function randomId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+function firstOnlineReplicaHolder(
+  file: MeshFile,
+  nodeList: MeshNode[],
+): MeshNode | undefined {
+  for (const id of file.replicaNodes) {
+    const n = nodeList.find((x) => x.id === id);
+    if (n?.enabled && n.status !== "offline") return n;
+  }
+  return undefined;
+}
+
+function firstNodeMissingReplica(
+  file: MeshFile,
+  nodeList: MeshNode[],
+): MeshNode | undefined {
+  const holders = new Set(file.replicaNodes);
+  return nodeList.find(
+    (n) => n.enabled && n.status !== "offline" && !holders.has(n.id),
+  );
 }
 
 function shortPeerHint(url: string): string {
@@ -341,7 +364,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const boot = window.setTimeout(() => {
       void refresh();
     }, 0);
-    const id = window.setInterval(() => void refresh(), POLL_MS);
+    const id = window.setInterval(() => void refresh(), MESH_POLL_INTERVAL_MS);
     return () => {
       window.clearTimeout(boot);
       window.clearInterval(id);
@@ -461,8 +484,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const downloadClusterFile = useCallback(
     async (filename: string) => {
       const f = files.find((x) => x.name === filename);
-      const holderId = f?.replicaNodes[0];
-      const n = holderId ? nodes.find((x) => x.id === holderId) : pickIngress();
+      const candidate =
+        f != null ? firstOnlineReplicaHolder(f, nodes) : undefined;
+      const n = candidate ?? pickIngress();
       if (!n) {
         pushToast({
           title: "Aucun nœud pour télécharger",
@@ -714,26 +738,34 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const triggerReplicate = useCallback(
     (fileId: string) => {
       const file = files.find((f) => f.id === fileId);
-      const ingress = pickIngress();
-      if (!file || !ingress) return;
+      if (!file) return;
       void (async () => {
         try {
-          const sourceId = file.replicaNodes[0];
-          const source = sourceId
-            ? nodes.find((n) => n.id === sourceId)
-            : undefined;
+          const source = firstOnlineReplicaHolder(file, nodes);
           if (!source) {
             pushToast({
-              title: "Aucun réplica source",
+              title: "Aucune source en ligne",
+              description:
+                "Aucun nœud connu comme détenteur n’est joignable pour ce fichier.",
               variant: "error",
             });
             return;
           }
+          const target = firstNodeMissingReplica(file, nodes);
+          if (!target) {
+            pushToast({
+              title: "Couverture complète sur les pairs sous tension",
+              description:
+                "Tous les nœuds inclus dans la scrutation possèdent déjà une réplique locale.",
+              variant: "default",
+            });
+            return;
+          }
           const blob = await apiDownload(source.baseUrl, file.name);
-          await apiUpload(ingress.baseUrl, file.name, blob, false);
+          await apiUpload(target.baseUrl, file.name, blob, false);
           pushToast({
-            title: "Diffusion déclenchée",
-            description: file.name,
+            title: "Réplication dirigée envoyée",
+            description: `${file.name} → ${target.label}`,
             variant: "success",
           });
           void refresh();
@@ -746,7 +778,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
       })();
     },
-    [files, nodes, pickIngress, pushToast, refresh],
+    [files, nodes, pushToast, refresh],
   );
 
   const value: DataContextValue = {

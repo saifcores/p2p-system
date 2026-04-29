@@ -126,6 +126,17 @@ export function ReplicationPage() {
                     Chargement du journal de réplication…
                   </td>
                 </tr>
+              ) : replication.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="py-10 text-center text-sm text-slate-500"
+                  >
+                    Envoyez des fichiers depuis la page Objets puis attendez
+                    quelques secondes : les lignes reflètent alors la diffusion
+                    asynchrone vers vos pairs configurés dans Spring Boot.
+                  </td>
+                </tr>
               ) : (
                 replication.map((r) => (
                   <tr key={r.id}>

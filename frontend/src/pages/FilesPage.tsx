@@ -42,6 +42,7 @@ export function FilesPage() {
     uploadFileObject,
     downloadClusterFile,
     loading,
+    refreshError,
   } = useMeshData();
   const [drag, setDrag] = useState(false);
   const [detail, setDetail] = useState<MeshFile | null>(null);
@@ -147,6 +148,23 @@ export function FilesPage() {
                     className="py-10 text-center text-sm text-slate-500"
                   >
                     Chargement de l’index d’objets…
+                  </td>
+                </tr>
+              ) : files.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-10 px-2 text-center text-sm">
+                    <p className="text-slate-400">
+                      Aucun objet indexé pour l’instant — déposez un fichier
+                      ci‑dessus ou démarrez les nœuds Spring Boot listés dans
+                      vos variables{" "}
+                      <code className="font-mono text-cyan-300/90">
+                        VITE_P2P_NODE_URLS
+                      </code>
+                      .
+                    </p>
+                    {refreshError ? (
+                      <p className="mt-2 text-amber-200/85">{refreshError}</p>
+                    ) : null}
                   </td>
                 </tr>
               ) : (

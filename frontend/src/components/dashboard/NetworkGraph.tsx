@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useMemo } from "react";
+import { MESH_POLL_INTERVAL_MS } from "../../config";
 import { useMeshData } from "../../context/useMeshData";
 import type { MeshNode } from "../../types";
 
@@ -43,7 +44,9 @@ export function NetworkGraph() {
           <p className="text-sm font-semibold text-white">
             Topologie en direct
           </p>
-          <p className="text-xs text-slate-500">Arêtes gossip · 30 dern. s</p>
+          <p className="text-xs text-slate-500">
+            Arêtes connues depuis les pairs · ~{MESH_POLL_INTERVAL_MS / 1000}s
+          </p>
         </div>
         <div className="flex items-center gap-2 text-[11px] text-slate-400">
           <span className="inline-flex items-center gap-1.5">

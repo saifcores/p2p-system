@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Cpu, Power, Trash2, UserPlus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useMeshData } from "../context/useMeshData";
+import { MESH_POLL_INTERVAL_MS } from "../config";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { Card, CardHeader } from "../components/ui/Card";
@@ -136,7 +137,7 @@ export function NodesPage() {
         <Card className="lg:col-span-2">
           <CardHeader
             title="Signaux de santé"
-            subtitle="Sondes synthétiques · intervalle 500 ms"
+            subtitle={`Sondes synthétiques · scrutation environ toutes les ${MESH_POLL_INTERVAL_MS / 1000}s`}
           />
           <div className="grid gap-4 sm:grid-cols-3">
             {["Latence P95", "Perte de paquets", "Pression disque"].map(

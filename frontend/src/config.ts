@@ -16,3 +16,6 @@ export const TARGET_REPLICAS = Math.max(
   1,
   Number.parseInt(import.meta.env.VITE_TARGET_REPLICAS ?? "3", 10) || 3,
 );
+
+/** Must match polling in `DataContext` refresh interval. */
+export const MESH_POLL_INTERVAL_MS = 4000;

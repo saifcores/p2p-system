@@ -9,6 +9,7 @@ import {
   Radio,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { TARGET_REPLICAS } from "../config";
 
 const items = [
   { to: "/", label: "Vue d’ensemble", icon: LayoutDashboard, end: true },
@@ -64,7 +65,7 @@ export function Sidebar({
           Facteur de réplication
         </p>
         <p className="mt-1 text-2xl font-semibold tracking-tight text-white">
-          3×
+          {TARGET_REPLICAS}×
         </p>
         <p className="mt-2 text-[11px] leading-relaxed text-slate-400">
           Écritures en quorum entre zones de disponibilité. Tolérance de panne :
