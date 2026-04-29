@@ -1,0 +1,15 @@
+# Profil pour hébergement type Render / PaaS : port injecté par la plateforme ($PORT).
+# Activer avec SPRING_PROFILES_ACTIVE=render
+server:
+  port: ${PORT:8080}
+
+node:
+  id: ${NODE_ID:node-render}
+  storage: ${NODE_STORAGE:storage_render}
+  # Pairs distants : définir NODE_PEERS_0, NODE_PEERS_1, … ou laisser vide (nœud isolé).
+  peers: []
+
+p2p:
+  cors:
+    # Rendez vos préfixes cohérents avec l’URL publique du frontend sur Render.
+    allowed-origin-patterns: http://localhost:*,http://127.0.0.1:*,https://*.onrender.com

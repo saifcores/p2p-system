@@ -1,0 +1,35 @@
+# Render Blueprint — https://render.com/docs/infrastructure-as-code
+#
+# Déploiement : Dashboard Render → « New » → « Blueprint » → lien vers ce fichier.
+#
+# Après la première mise en ligne du service web, copiez son URL HTTPS et
+# configurez-la sur le site statique : variable VITE_P2P_NODE_URLS puis
+# redéployez le static site (les variables VITE_* sont figées au build).
+#
+# Cas multi-nœuds : créez plusieurs services web à partir du même Dockerfile
+# et renseignez NODE_PEERS_0, NODE_PEERS_1, … (Spring binding) ou le profil YAML.
+
+services:
+  - type: web
+    name: p2p-backend
+    runtime: docker
+    region: frankfurt
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: render
+      - key: NODE_ID
+        value: node-render-1
+
+staticSites:
+  - name: p2p-console
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    publishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
