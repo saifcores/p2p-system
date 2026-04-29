@@ -568,13 +568,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
         );
 
         addActivity(
-          `Maillage : ${normalizedNew} enregistré sur ${forwardOk}/${targets.length} nœud(s) ; sens inverse ${reverseOk}/${clusterMembers.length}`,
+          `Maillage : ${normalizedNew} enregistré sur ${forwardOk}/${targets.length} nœud(s) ; sens inverse ${reverseOk}/${clusterMembers.length}`,
           "health",
         );
 
         if (clusterMembers.length > 0 && reverseOk === 0) {
           pushToast({
-            title: "Demi-maillage : démarrez le nouveau pair",
+            title: "Demi-maillage : démarrez le nouveau pair",
             description:
               "Les nœuds existants connaissent cette URL. Démarrez la nouvelle JVM puis refaites « Ajouter un pair » pour terminer.",
             variant: "default",

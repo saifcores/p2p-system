@@ -67,7 +67,7 @@ export function Sidebar({
           3×
         </p>
         <p className="mt-2 text-[11px] leading-relaxed text-slate-400">
-          Écritures en quorum entre zones de disponibilité. Tolérance de panne :
+          Écritures en quorum entre zones de disponibilité. Tolérance de panne :
           1 nœud.
         </p>
       </div>
