@@ -1,10 +1,10 @@
 # Render Blueprint — https://render.com/docs/blueprint-spec
+# Monorepo : `rootDir` + chemins relatifs à chaque app
+# (https://render.com/docs/monorepo-support#setting-a-root-directory).
+# Site statique : pas de clé `region` (CDN global ; le backend reste en frankfurt).
 #
-# New » Blueprint » sélectionner ce dépôt (render.yaml à la racine).
-#
-# Après le premier déploiement du backend, ajoutez sur p2p-console la variable
-# VITE_P2P_NODE_URLS (URL HTTPS du backend, sans slash final), puis redeploy du
-# statique avec « Clear build cache » — les VITE_* sont figées au build npm.
+# Puis : sur p2p-console, variable VITE_P2P_NODE_URLS = URL HTTPS du backend
+# (sans slash final), puis redeploy statique « Clear build cache ».
 
 services:
   - type: web
@@ -12,29 +12,36 @@ services:
     runtime: docker
     region: frankfurt
     plan: free
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    numInstances: 1
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     healthCheckPath: /health
+    maxShutdownDelaySeconds: 60
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: render
       - key: NODE_ID
         value: node-render-1
 
-  # Ancienne clé `staticSites` n’est plus dans la spec : même bloc sous services,
-  # runtime `static`, champ obligatoire `staticPublishPath` (relatif à la racine git).
   - type: web
     name: p2p-console
     runtime: static
-    region: frankfurt
     rootDir: frontend
     buildCommand: npm ci && npm run build
-    staticPublishPath: ./frontend/dist
+    staticPublishPath: ./dist
     envVars:
       - key: NODE_VERSION
         value: "22.14.0"
       - key: VITE_TARGET_REPLICAS
         value: "3"
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
     routes:
       - type: rewrite
         source: /*
