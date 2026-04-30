@@ -39,9 +39,17 @@ public class FileService {
     private Path storageDirectory;
 
     @PostConstruct
-    void initStorage() throws IOException {
+    void initStorage() {
         storageDirectory = Path.of(nodeConfig.getStorage()).toAbsolutePath().normalize();
-        ensureStorageDir();
+        try {
+            ensureStorageDir();
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                    "Cannot create storage directory "
+                            + storageDirectory
+                            + " (set NODE_STORAGE to a writable path, e.g. /app/storage_render)",
+                    e);
+        }
         log.info("[node={}] Local storage ready at {}", nodeConfig.getId(), storageDirectory);
     }
 

@@ -16,7 +16,10 @@ RUN groupadd --system app \
 
 COPY --from=build /build/target/p2p-node-1.0.0.jar ./app.jar
 
-RUN chown app:app /app/app.jar
+# Profil render : stockage par défaut sous /app/storage_render (cf.
+# application-render.yml). L’utilisateur non-root doit pouvoir écrire ici.
+RUN mkdir -p /app/storage_render \
+  && chown -R app:app /app
 
 USER app
 

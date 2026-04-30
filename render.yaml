@@ -23,6 +23,8 @@ services:
         value: render
       - key: NODE_ID
         value: node-render-1
+      - key: NODE_STORAGE
+        value: /app/storage_render
 
   - type: web
     name: p2p-console
