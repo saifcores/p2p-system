@@ -55,7 +55,7 @@ export function NodesPage() {
 
   return (
     <div className="space-y-6">
-      {/* <Card>
+      <Card>
         <CardHeader
           title="Ajouter un nœud au maillage"
           subtitle="POST /internal/peers · enregistré sur les JVM existantes puis sens inverse si le nouveau pair est déjà UP"
@@ -115,7 +115,7 @@ export function NodesPage() {
           proxy). Les nœuds listés dans <code>VITE_P2P_NODE_URLS</code> peuvent
           être retirés du tableau tout en gardant leur JVM sous tension.
         </p>
-      </Card> */}
+      </Card>
 
       <Card>
         <CardHeader
