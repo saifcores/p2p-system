@@ -7,7 +7,10 @@ node:
   id: ${NODE_ID:node-render}
   # Chemin absolu : ne pas dépendre de user.dir (Docker / PaaS).
   storage: ${NODE_STORAGE:/app/storage_render}
-  # Pairs distants : définir NODE_PEERS_0, NODE_PEERS_1, … ou laisser vide (nœud isolé).
+  # Render fournit RENDER_EXTERNAL_URL (HTTPS public) : évite « localhost » pour
+  # l’auto-détection et la réplication entre nœuds hébergés.
+  advertised-url: ${NODE_ADVERTISED_URL:${RENDER_EXTERNAL_URL:}}
+  # Pairs distants : NODE_PEERS_0, NODE_PEERS_1, … ou laisser vide (UI / POST).
   peers: []
 
 p2p:

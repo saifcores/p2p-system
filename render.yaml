@@ -1,11 +1,14 @@
 # Render Blueprint — https://render.com/docs/blueprint-spec
 # Monorepo : `rootDir` + chemins relatifs à chaque app
 # (https://render.com/docs/monorepo-support#setting-a-root-directory).
-# Site statique : pas de clé `region` (CDN global ; le backend reste en frankfurt).
+# Site statique : pas de clé `region` (CDN global ; les backends restent en frankfurt).
 # Plan free : pas de `maxShutdownDelaySeconds` (réservé aux types payants).
 #
-# Puis : sur p2p-console, variable VITE_P2P_NODE_URLS = URL HTTPS du backend
-# (sans slash final), puis redeploy statique « Clear build cache ».
+# Deux JVM distinctes = deux services web (ne pas augmenter numInstances : ce
+# serait plusieurs instances du même nœud, pas un maillage P2P).
+#
+# Console : VITE_P2P_NODE_URLS = URLs HTTPS des backends, séparées par des
+# virgules, puis redeploy statique « Clear build cache ».
 
 services:
   - type: web
@@ -25,6 +28,42 @@ services:
         value: node-render-1
       - key: NODE_STORAGE
         value: /app/storage_render
+
+  - type: web
+    name: p2p-backend-2
+    runtime: docker
+    region: frankfurt
+    plan: free
+    numInstances: 1
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: render
+      - key: NODE_ID
+        value: node-render-2
+      - key: NODE_STORAGE
+        value: /app/storage_render_2
+
+  - type: web
+    name: p2p-backend-3
+    runtime: docker
+    region: frankfurt
+    plan: free
+    numInstances: 1
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: render
+      - key: NODE_ID
+        value: node-render-3
+      - key: NODE_STORAGE
+        value: /app/storage_render_3
 
   - type: web
     name: p2p-console
