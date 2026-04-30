@@ -33,7 +33,7 @@ management:
 p2p:
   cors:
     # Comma-separated Ant-style patterns (Spring 5.3+). Match Vite default port and LAN previews.
-    allowed-origin-patterns: http://localhost:*,http://127.0.0.1:*
+    allowed-origin-patterns: http://localhost:*,http://127.0.0.1:*,https://p2p-system.vercel.app/*
 
 logging:
   level:

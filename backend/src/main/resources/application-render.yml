@@ -16,4 +16,4 @@ node:
 p2p:
   cors:
     # Rendez vos préfixes cohérents avec l’URL publique du frontend sur Render.
-    allowed-origin-patterns: http://localhost:*,http://127.0.0.1:*,https://*.onrender.com
+    allowed-origin-patterns: http://localhost:*,http://127.0.0.1:*,https://p2p-system.vercel.app/*
